@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Recommendation System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            color: #111;
+            min-height: 100vh;
+        }
+
+        /* Fullscreen background video */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
+            object-fit: cover;
+        }
+
+        /* Dark overlay for readability */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 16px 60px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 18px;
+            padding: 24px 22px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            text-align: center;
+            color: #444;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            background: #ffffffee;
+            padding: 12px 14px;
+            border-radius: 12px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: #222;
+        }
+
+        .form-input {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .btn-row {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 26px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 999px;
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #A0522D, #CD853F);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .results-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f3f3f3;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) td {
+            background: #fafafa;
+        }
+
+        .caption {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #444;
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background video -->
+    <video autoplay muted loop id="bg-video">
+        <source src="{{ url_for('static', filename='background.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="overlay"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="card">
+            <div class="title">🚗 Car Recommendation System</div>
+            <div class="subtitle">
+                Get car suggestions based on your engine preferences, fuel economy and budget.
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="card">
+            <form method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Horsepower (Engine HP)</label>
+                        <input
+                            class="form-input"
+                            type="number"
+                            name="hp"
+                            min="50" max="1000"
+                            value="{{ defaults.hp }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Highway MPG</label>
+                        <input
+                            class="form-input"
+                            type="number"
+                            name="highway_mpg"
+                            min="5" max="100"
+                            value="{{ defaults.highway_mpg }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Number of Cylinders</label>
+                        <input
+                            class="form-input"
+                            type="number"
+                            name="cylinders"
+                            min="2" max="16"
+                            value="{{ defaults.cylinders }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">City MPG</label>
+                        <input
+                            class="form-input"
+                            type="number"
+                            name="city_mpg"
+                            min="5" max="100"
+                            value="{{ defaults.city_mpg }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Budget (USD)</label>
+                        <input
+                            class="form-input"
+                            type="number"
+                            name="budget"
+                            min="1000" max="200000" step="500"
+                            value="{{ defaults.budget }}"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn">Find Cars</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results -->
+        {% if recommendations %}
+        <div class="card">
+            <div class="results-title">Top Recommended Cars</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Fuel Type</th>
+                        <th>Engine HP</th>
+                        <th>MSRP ($)</th>
+                        <th>Similarity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for i, row in recommendations.iterrows() %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ row["Make"] }}</td>
+                        <td>{{ row["Model"] }}</td>
+                        <td>{{ row["Year"] }}</td>
+                        <td>{{ row["Engine Fuel Type"] }}</td>
+                        <td>{{ row["Engine HP"] }}</td>
+                        <td>{{ "{:,.0f}".format(row["MSRP"]) }}</td>
+                        <td>{{ row["Similarity Score"] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="caption">
+                Cars are recommended based on similarity in engine specs, fuel economy, and price.
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
