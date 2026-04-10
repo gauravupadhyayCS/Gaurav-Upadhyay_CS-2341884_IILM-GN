@@ -106,7 +106,7 @@ Expected performance (based on literature):
 
 ## 📄 Research Paper
 
-📎 [View Full Paper](paper/BT3069_Research%20Paper.pdf)
+📎 [View Full Paper](https://github.com/gauravupadhyayCS/Gaurav-Upadhyay_CS-2341884_IILM-GN/blob/main/Major%20Project%20(BT3069)(6th%20sem)/BT3069_Research%20Paper.pdf)
 
 ---
 
